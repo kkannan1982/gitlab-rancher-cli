@@ -1,55 +1,49 @@
-badouralix/dockerfiles
-======================
+rancher-cli
+===========
 
+[![](https://images.microbadger.com/badges/version/badouralix/rancher-cli.svg)](https://microbadger.com/images/badouralix/rancher-cli "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/image/badouralix/rancher-cli.svg)](https://microbadger.com/images/badouralix/rancher-cli "Get your own image badge on microbadger.com")
 
-This repository contains some Dockerfiles.
+This **Dockerfile** builds a docker image based on [rancher/cli](https://hub.docker.com/r/rancher/cli/), with an overridden
+`ENTRYPOINT` to handle custom `CMD`s. Useful when using, for instance,
+[gitlab-ci](https://docs.gitlab.com/ce/ci/docker/using_docker_images.html#how-docker-integration-works), or any other CI/CD tool
+providing job scripts to be run inside the container.
 
-See the repo on [Docker Hub](https://hub.docker.com/u/badouralix/).
+See the repo on [Docker Hub](https://hub.docker.com/r/badouralix/rancher-cli/).
 
-Current dockerfiles
--------------------
+NOTE: This repository is extracted from badouralix/dockerfiles. 
 
-* [curl-http2](https://hub.docker.com/r/badouralix/curl-http2/) : alpine-based docker image for curl with http2 support
-[![](https://images.microbadger.com/badges/version/badouralix/curl-http2.svg)](https://microbadger.com/images/badouralix/curl-http2 "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/badouralix/curl-http2.svg)](https://microbadger.com/images/badouralix/curl-http2 "Get your own image badge on microbadger.com")
+## Usage
 
-* [oh-my-via](https://hub.docker.com/r/badouralix/oh-my-via/) : image for oh-my-via theme testing purpose
-[![](https://images.microbadger.com/badges/version/badouralix/oh-my-via.svg)](https://microbadger.com/images/badouralix/oh-my-via "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/badouralix/oh-my-via.svg)](https://microbadger.com/images/badouralix/oh-my-via "Get your own image badge on microbadger.com")
+### CLI usage
 
-* [python-scrapy](https://hub.docker.com/r/badouralix/python-scrapy/) : debian-based docker image for scrapy
-[![](https://images.microbadger.com/badges/version/badouralix/python-scrapy.svg)](https://microbadger.com/images/badouralix/python-scrapy "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/badouralix/python-scrapy.svg)](https://microbadger.com/images/badouralix/python-scrapy "Get your own image badge on microbadger.com")
-
-* [rancher-cli](https://hub.docker.com/r/badouralix/rancher-cli/) : rancher-cli for gitlab-ci
-[![](https://images.microbadger.com/badges/version/badouralix/rancher-cli.svg)](https://microbadger.com/images/badouralix/rancher-cli "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/badouralix/rancher-cli.svg)](https://microbadger.com/images/badouralix/rancher-cli "Get your own image badge on microbadger.com")
-
-* [zunit](https://hub.docker.com/r/badouralix/zunit/) : alpine-based image for ZUnit, a powerful unit testing framework for ZSH
-[![](https://images.microbadger.com/badges/version/badouralix/zunit.svg)](https://microbadger.com/images/badouralix/zunit "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/badouralix/zunit.svg)](https://microbadger.com/images/badouralix/zunit "Get your own image badge on microbadger.com")
-
-
-Usage
------
+Assuming envvars `RANCHER_URL`, `RANCHER_ACCESS_KEY` and `RANCHER_SECRET_KEY` are set:
 
 ```
-$ git clone https://github.com/badouralix/dockerfiles.git badouralix-dockerfiles
-$ cd badouralix-dockerfiles/<image_name>
-$ docker build -t $USER-local/<image_name> .
+docker run --rm -e RANCHER_URL=$RANCHER_URL -e RANCHER_ACCESS_KEY=$RANCHER_ACCESS_KEY -e RANCHER_SECRET_KEY=$RANCHER_SECRET_KEY badouralix/rancher-cli rancher ps
 ```
 
-### Check out only some subdirectories
+If rancher command is not an alpine command, `rancher` can be omitted within the previous command.
 
-As of git version 1.7, you can check out just a subtree, using `core.sparsecheckout` option.
+### GitLab-CI
 
-### Tips and tricks
+Assuming secret variables `RANCHER_URL`, `RANCHER_ACCESS_KEY` and `RANCHER_SECRET_KEY` are set in your CI/CD pipelines settings,
+image can be use as follow, to restart a service for instance:
 
-Give <https://github.com/badouralix/dockerize> a try, for painless and carefree docker build !
+```
+image: badouralix/rancher-cli
+
+script:
+  - rancher --wait restart stack/service
+```
 
 
-License
--------
+## Warning
 
-Unless explicitly stated to the contrary, all contents licensed under the [WTFPL](LICENSE).
+When using it in command line, this image is known to be buggy with several built-in commands such as `help`... The safest way to
+use this image is to always append `rancher` before any rancher-cli command, thus to prevent any error.
+
+
+## License
+
+All contents licensed under the [WTFPL](https://github.com/badouralix/dockerfiles/blob/master/LICENSE)
 
